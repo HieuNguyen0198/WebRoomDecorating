@@ -14,7 +14,8 @@ public class CameraController : MonoBehaviour
     private Vector3 newMousePosition;
 
     private RaycastHit vision;
-    private float rayLeght = 20f;
+
+    private GameObject curentRaycastObject;
 
     GameObject stick = null;
     void Start()
@@ -54,7 +55,7 @@ public class CameraController : MonoBehaviour
         }
 
         //teleport camera
-        //check raycast
+        //check raycast plane
 
         if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out vision))
         {
@@ -68,10 +69,30 @@ public class CameraController : MonoBehaviour
                     currentPositionRaycast = newPossionRaycast;
                 }        
             }
+
+            //raycast object
+            if (vision.collider.tag == "object")
+            {
+                curentRaycastObject = vision.collider.gameObject;
+                curentRaycastObject.GetComponent<Outline>().OutlineWidth = 5f;
+                stick.SetActive(false);
+            }
+            else
+            {
+                if(curentRaycastObject != null)
+                {
+                    curentRaycastObject.GetComponent<Outline>().OutlineWidth = 0f;
+                }        
+            }
+
         }
         else
         {
             stick.SetActive(false);
+            if (curentRaycastObject != null)
+            {
+                curentRaycastObject.GetComponent<Outline>().OutlineWidth = 0f;
+            }
         }
 
         if (Input.GetMouseButtonDown(0))
@@ -81,20 +102,5 @@ public class CameraController : MonoBehaviour
                 mainCamera.transform.position = new Vector3(currentPositionRaycast.x, mainCamera.transform.position.y, currentPositionRaycast.z);
             }
         }
-
-        /*
-        if(Input.GetMouseButtonDown(0))
-        {
-            var mask = LayerMask.GetMask("floor");
-            if ((Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out vision, mask)))
-            {
-                if(vision.collider.tag == "floor")
-                {
-                    Debug.Log("san nha: " + vision.point);
-                    mainCamera.transform.position = new Vector3(vision.point.x, mainCamera.transform.position.y, vision.point.z);
-                }
-            }
-        }
-        */
     }
 }
