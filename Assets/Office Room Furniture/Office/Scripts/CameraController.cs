@@ -32,7 +32,6 @@ public class CameraController : MonoBehaviour
             checkMouseDrag = true;
             mousePosition = Input.mousePosition;
             newMousePosition = Input.mousePosition;
-            //mainCamera.transform.Rotate(mainCamera.transform.rotation.x, mainCamera.transform.rotation.y + 10, mainCamera.transform.rotation.z);
         }
         if(Input.GetMouseButtonUp(1))
         {
@@ -44,8 +43,12 @@ public class CameraController : MonoBehaviour
             if(newMousePosition != mousePosition)
             {
                 Vector3 vector3 = newMousePosition - mousePosition;
-                mainCamera.transform.Rotate(-vector3.y/5 , 0, 0f, Space.Self);
-                mainCamera.transform.Rotate(0, vector3.x/5, 0f, Space.World);
+                Transform transform = mainCamera.transform;
+                transform.Rotate(-vector3.y / 5, 0, 0f, Space.Self);
+                transform.Rotate(0, vector3.x / 5, 0f, Space.World);
+                mainCamera.transform.rotation = Quaternion.Lerp(mainCamera.transform.rotation, transform.rotation, 1000f);
+                //mainCamera.transform.Rotate(-vector3.y/5 , 0, 0f, Space.Self);
+                //mainCamera.transform.Rotate(0, vector3.x/5, 0f, Space.World);
                 mousePosition = newMousePosition;
             }
         }
@@ -53,15 +56,14 @@ public class CameraController : MonoBehaviour
         //teleport camera
         //check raycast
 
-        var mask = LayerMask.GetMask("floor");
-        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out vision, mask))
+        if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out vision))
         {
             if (vision.collider.tag == "floor")
             {
                 newPossionRaycast = vision.point;
                 if (newPossionRaycast != currentPositionRaycast)
                 {
-                    stick.transform.position = vision.point;
+                    stick.transform.position = new Vector3(vision.point.x, vision.point.y + 0.2f, vision.point.z);
                     stick.SetActive(true);
                     currentPositionRaycast = newPossionRaycast;
                 }        
